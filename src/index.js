@@ -1,5 +1,8 @@
 import './style.css';
+import PubSub from 'pubsub-js';
+import DataController from './DataController';
+import DisplayController from './DisplayController';
 
-const body = document.querySelector('body');
-
-body.textContent = 'Hello!';
+document.addEventListener('DOMContentLoaded', () => {
+	PubSub.publish('DOMContentLoaded');
+});
