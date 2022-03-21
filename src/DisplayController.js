@@ -8,6 +8,7 @@ const DisplayController = (() => {
 	let outputElement = null;
 	let cityElement = null;
 	let tempElement = null;
+	let weatherElement = null;
 
 	const initRender = () => {
 		const body = document.querySelector('body');
@@ -16,7 +17,16 @@ const DisplayController = (() => {
 		app.setAttribute('id', 'app');
 		body.appendChild(app);
 
+		const heading = document.createElement('h1');
+		heading.textContent = 'Weather App!';
+		app.appendChild(heading);
+
+		const description = document.createElement('p');
+		description.textContent = `What's the weather like today?`;
+		app.appendChild(description);
+
 		const form = document.createElement('form');
+		form.setAttribute('onsubmit', 'event.preventDefault()');
 		app.appendChild(form);
 
 		const cityInputLabel = document.createElement('label');
@@ -47,8 +57,17 @@ const DisplayController = (() => {
 		tempField.setAttribute('id', 'temp');
 		output.appendChild(tempField);
 
+		const weatherField = document.createElement('div');
+		weatherField.setAttribute('id', 'weather');
+		output.appendChild(weatherField);
+
 		// Event Listners
-		submitButton.addEventListener('click', handleClick);
+		cityInput.addEventListener('keyup', (e) => {
+			if (e.key == 'Enter') {
+				handleSubmit();
+			}
+		});
+		submitButton.addEventListener('click', handleSubmit);
 	};
 
 	const cacheDOM = () => {
@@ -56,16 +75,39 @@ const DisplayController = (() => {
 		outputElement = document.querySelector('#output');
 		cityElement = document.querySelector('#city');
 		tempElement = document.querySelector('#temp');
+		weatherElement = document.querySelector('#weather');
 
 		PubSub.publish('Get Data', { city: 'London' });
 	};
 
 	const renderOutput = () => {
-		cityElement.textContent = state.name;
-		tempElement.textContent = state.main.temp;
+		let validCity = null;
+
+		if (state.cod !== 200) {
+			validCity = false;
+		} else {
+			validCity = true;
+		}
+
+		cityElement.textContent = validCity
+			? `${state.name}, ${state.sys.country}`
+			: 'Invalid City!';
+		tempElement.textContent = `${validCity ? state.main.temp : '???'} °C`;
+
+		if (validCity) {
+			for (const weather in state.weather) {
+				if (weather == state.weather.length - 1) {
+					weatherElement.textContent += `${state.weather[weather].description}`;
+				} else {
+					weatherElement.textContent += `${state.weather[weather].description}, `;
+				}
+			}
+		} else {
+			weatherElement.textContent = '???';
+		}
 	};
 
-	const handleClick = (event) => {
+	const handleSubmit = () => {
 		const inputValue = cityInputElement.value;
 		PubSub.publish('Get Data', { city: inputValue });
 	};
@@ -77,9 +119,7 @@ const DisplayController = (() => {
 	});
 
 	PubSub.subscribe('Data Loaded', (msg, data) => {
-		console.log(msg);
 		state = data;
-		console.log(state);
 		renderOutput();
 	});
 })();

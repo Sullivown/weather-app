@@ -6,12 +6,17 @@ const DataController = (() => {
 	// Eg API Call: https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}
 
 	async function getWeather(city) {
-		let response = await fetch(
-			`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}`
-		);
-		let data = await response.json();
+		try {
+			let response = await fetch(
+				`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`
+			);
 
-		PubSub.publish('Data Loaded', data);
+			let data = await response.json();
+			PubSub.publish('Data Loaded', data);
+		} catch (error) {
+			console.error(error);
+			PubSub.publish('Data Loaded', data);
+		}
 	}
 
 	// PubSub
