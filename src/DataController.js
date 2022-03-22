@@ -3,8 +3,6 @@ import PubSub from 'pubsub-js';
 const DataController = (() => {
 	const API_KEY = '3c6358d85a3f7131abb3bdb5b015b27c';
 
-	// Eg API Call: https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}
-
 	async function getWeather(city) {
 		try {
 			let response = await fetch(

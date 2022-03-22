@@ -10,6 +10,7 @@ const DisplayController = (() => {
 	let tempElement = null;
 	let weatherElement = null;
 
+	// Renders the page structure
 	const initRender = () => {
 		const body = document.querySelector('body');
 
@@ -42,7 +43,7 @@ const DisplayController = (() => {
 		const submitButton = document.createElement('button');
 		submitButton.setAttribute('type', 'button');
 
-		submitButton.textContent = 'Search City';
+		submitButton.textContent = 'Get Weather';
 		form.appendChild(submitButton);
 
 		const output = document.createElement('div');
@@ -70,6 +71,7 @@ const DisplayController = (() => {
 		submitButton.addEventListener('click', handleSubmit);
 	};
 
+	// Cache DOM elements
 	const cacheDOM = () => {
 		cityInputElement = document.querySelector('#city-input');
 		outputElement = document.querySelector('#output');
@@ -80,6 +82,7 @@ const DisplayController = (() => {
 		PubSub.publish('Get Data', { city: 'London' });
 	};
 
+	// Render the Output div with relevent search results
 	const renderOutput = () => {
 		let validCity = null;
 
@@ -95,6 +98,7 @@ const DisplayController = (() => {
 		tempElement.textContent = `${validCity ? state.main.temp : '???'} °C`;
 
 		if (validCity) {
+			weatherElement.textContent = '';
 			for (const weather in state.weather) {
 				if (weather == state.weather.length - 1) {
 					weatherElement.textContent += `${state.weather[weather].description}`;
